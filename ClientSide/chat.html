@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    <script src="https://kit.fontawesome.com/0309c9150f.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/chatStyles.css">
+</head>
+
+
+<body>
+
+    <div class="container">
+        <header>
+            <span>Obecnie Zalogowany Jako: <span id="logged-as">User1</span></span>
+            <button id="logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </header>
+        <main>
+            <section id="left-panel">
+                <div id="left-panel__user-search">
+                    <input id="user-search__input" type="text" placeholder="username" name="recipient">
+                    <button id="user-search__button" type="submit"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <div id="left-panel__users-list">
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i><span>User1</span></button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>User5</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                    <button class="users-list_element"><i class="fa-solid fa-user"></i>Kowalski05</button>
+                </div>
+            </section>
+            <section id="chat-panel">
+                <div id="chat-panel__header">
+
+                    <h1><i class="fa-solid fa-user"></i><h1 id="chat-panel__header__username">User2</h1></h1>
+
+                </div>
+                <div id="chat-panel__messages-list">
+                    <div class="message">
+                        <span class="message_nickname">User1</span><br>
+                        <span class="message_text">Hi, how are You?</span>
+                    </div>
+                    <div class="message sent-by-me">
+                        <span class="message_nickname">User2</span><br>
+                        <span class="message_text">Hello</span>
+                    </div>
+                    <div class="message">
+                        <span class="message_nickname">User1</span><br>
+                        <span class="message_text">Hi, how are</span>
+                    </div>
+                </div>
+                <div id="send-message-panel">
+                    <input id="send-message-panel__input" placeholder="some text">
+                    <button id="send-message-panel__button"><i class="fa-solid fa-share"></i></button>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="js/chatScript.js"></script>
+    <script src="js/signalrReqHandler.js"></script>
+</body>
+
+</html>

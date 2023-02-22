@@ -1,0 +1,2 @@
+token CSRF
+blacklista tokenów
