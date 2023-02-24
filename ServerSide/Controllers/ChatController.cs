@@ -63,13 +63,21 @@ namespace ChatApp.Controllers
         }
 
 
-        [HttpGet("chatIds")]
+      /*  [HttpGet("chatIds")]
         public ActionResult GetAllUserChatIds()
         {
             List<int> ids = chatService.GetAllUserChatIds(User);
             return Ok(ids);
 
-        }
+        }*/
 
+
+        [HttpGet("onLogin")]
+        public ActionResult GetAllUserChats()
+        {
+            var result = chatService.GetAllUserChatIds(User);
+            return Ok(result);
+
+        }
     }
 }

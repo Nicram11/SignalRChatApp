@@ -1,2 +1,6 @@
 token CSRF
 blacklista tokenów
+ukrywanie chatów
+powiadomienie o dostaniu wiadomoci
+poprawienie relacji SQL
+dostosowanie wyglądu okna logowania i rejestracji

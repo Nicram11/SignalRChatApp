@@ -114,7 +114,7 @@ function displayMessage(message){
     messageLi.classList.add("message");
     messageNickname.classList.add("message_nickname");
     messageText.classList.add("message_text");
-    if (message.senderName == myUsername)
+    if (message.senderName.toLowerCase() == myUsername)
         messageLi.classList.add("sent-by-me");
 
     messageNickname.innerHTML = message.senderName;
@@ -184,12 +184,15 @@ class Chat{
 
 
 
-var url = 'https://localhost:7044/chatapp/chat/chatIds';
+var url = 'https://localhost:7044/chatapp/chat/onLogin';
 window.onload = function () {
     axios.get(url, {
         withCredentials: true
     }).then(function (response) {
-        response.data.forEach(id => joinRoom(id));
+        response.data[0].forEach(id => joinRoom(id));
+        //response.data[1].forEach(name => console.log(name));
+        console.log(response.data[0]);
+        response.data[1].forEach(username => createNewChatTab(username));
         chatIds = response.data;
         console.log(response.data);
         loogedAs.innerHTML= myUsername;

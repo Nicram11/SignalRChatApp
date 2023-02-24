@@ -30,7 +30,7 @@ namespace ChatApp.Controllers
         public ActionResult<IEnumerable<RegisterUserDTO>> GetAll()
         {
             var users = userService.GetAll();
-            return Ok(users);
+            return Ok(users); ;
         }
 
         [HttpPost("login")]
