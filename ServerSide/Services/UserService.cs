@@ -31,6 +31,8 @@ namespace ChatApp.Services
         private readonly IPasswordHasher<User> passwordHasher;
         private readonly AuthenticationSettings authenticationSettings;
 
+ 
+
         public UserService(ChatAppDbContext dbContext, IMapper mapper, IPasswordHasher<User> passwordHasher, AuthenticationSettings authenticationSettings)
         {
             this.dbContext = dbContext;
@@ -69,8 +71,7 @@ namespace ChatApp.Services
             return GenerateJwt(user);
         }
 
-
-     
+    
         public string GenerateJwt(User user)
         {
            

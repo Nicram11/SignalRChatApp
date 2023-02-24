@@ -2,6 +2,7 @@
 using ChatApp.Services;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Models;
 
 namespace ChatApp.Controllers
 {
@@ -9,7 +10,9 @@ namespace ChatApp.Controllers
     [ApiController]
     public class UserController : Controller
     {
+      
 
+    
 
         private IUserService userService;
         private CookieOptions jwtCookieOptions = new CookieOptions()
@@ -40,8 +43,8 @@ namespace ChatApp.Controllers
             {
                 string token = userService.LoginUser(dto);
 
-              
 
+                OnlineUsers.onlineUsersIds.Add(User.Identity.Name);
                 Response.Cookies.Append("JwtToken", token, jwtCookieOptions);
                 return Ok(token);
             }
@@ -77,12 +80,19 @@ namespace ChatApp.Controllers
                 Path = "/"
             };
             Response.Cookies.Delete("JwtToken", jwtCookieOptions);
-
+            OnlineUsers.onlineUsersIds.Remove(User.Identity.Name);
             //HttpContext.Response.Cookies.Append("JwtToken", " ",cookieOptions );
             //HttpContext.Response.Cookies.Append("username", "");
-    
+
 
             return NoContent();
+        }
+
+        [HttpPost("disconect")]
+        public ActionResult Disconect()
+        {
+            OnlineUsers.onlineUsersIds.Remove(User.Identity.Name);
+            return Ok();
         }
     }
 }

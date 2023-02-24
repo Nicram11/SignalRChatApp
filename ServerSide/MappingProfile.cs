@@ -12,6 +12,7 @@ namespace ChatApp
             CreateMap<User, RegisterUserDTO>();
             CreateMap<MessageDTO, Message>();
             CreateMap<Message, SentMessageDTO>();
+            CreateMap<IEnumerable<Message>, IEnumerable<MessageDTO>>();
         }
     }
 }

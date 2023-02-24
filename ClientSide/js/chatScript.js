@@ -27,13 +27,13 @@ recipientButton.addEventListener('click',async function () {
 
 
   
-    var status = await openChat(recipientName);
-    console.log(status);
-    if (status == 200 && !alredyExisting) {
-        createNewChatTab(recipientName);
+    let chatInfo = await openChat(recipientName);
+    console.log(chatInfo);
+    if (chatInfo.success && !alredyExisting) {
+        createNewChatTab(recipientName,chatInfo.chatId);
         recipientInput.value = '';
     }
-    else if (status != 200) {
+    else if (!chatInfo.success) {
         window.alert("nie znaleziono użytkownika");
     }
     
@@ -42,20 +42,29 @@ recipientButton.addEventListener('click',async function () {
 
 var currentOpenChatId;
 
-function createNewChatTab(username){
+function createNewChatTab(username, chatId, isReceived = false){
 
 let userButton = document.createElement('button');
     userButton.innerHTML = `<i class="fa-solid fa-user"></i><span>${username}</span>` ;
 userButton.classList.add("users-list_element");
-userButton.addEventListener('click', function (){
-    openChat(username);
-    
-})
+    userButton.id = `chatId${chatId}`;
+    if(isReceived)
+        userButton.classList.add("notification");
+    userButton.addEventListener('click', function () {
+        this.classList.remove("notification");
+        openChat(username);
+
+    });
 //userList.appendChild(userButton);
     userList.insertBefore(userButton, userList.firstChild);
 
 }
-
+class chatInfo{
+    constructor(success,chatId){
+        this.success=success;
+        this.chatId = chatId;
+    }
+}
 async function openChat(username) {
 
 
@@ -64,13 +73,15 @@ async function openChat(username) {
         var res = await axios.get(url, {
             withCredentials: true
         });
+        console.log(res);
         displayMessages(res.data.messages);
         headerUsername.innerHTML=username;
         currentOpenChatId = res.data.chatId;
-        return res.status;
+        //return res.status;
+        return new chatInfo(true, res.data.chatId);
     }
     catch (error) {
-        return error.response.status;
+        return new chatInfo(false, res.data.chatId);
     }
 
 /*function openChat(username) {
@@ -89,53 +100,56 @@ async function openChat(username) {
            
           //  joinRoom(currentOpenChatId);
         })*/
-    
    
-
-  
-
-
     function displayMessages(messages) {
-        
+
         messageList.innerHTML = ""; //wyczysc chat z poprzednich wiadomosci
 
         messages.forEach(message => {
             displayMessage(message);
         });
     }
+
+   
    
 }
-function displayMessage(message){
+
+function displayMessage(message) {
     let messageLi = document.createElement('div');
     let messageNickname = document.createElement('span');
     let messageText = document.createElement('span');
-  
+    let messageTime= document.createElement('span');
+
     let br = document.createElement('br');
+    let br2 = document.createElement('br');
     messageLi.classList.add("message");
     messageNickname.classList.add("message_nickname");
+    messageTime.classList.add("message_nickname");
     messageText.classList.add("message_text");
     if (message.senderName.toLowerCase() == myUsername)
         messageLi.classList.add("sent-by-me");
 
     messageNickname.innerHTML = message.senderName;
     messageText.innerHTML = message.messageValue;
-    
+    messageTime.innerHTML = message.sendingTime;
     messageLi.appendChild(messageNickname);
     messageLi.appendChild(br);
     messageLi.appendChild(messageText);
+    messageLi.appendChild(br2);
+    messageLi.appendChild(messageTime);
 
     messageList.appendChild(messageLi);
     messageWindow.scrollTop = messageWindow.scrollHeight;
 }
 
-
 class MessageDTO {
 
-    constructor(text, chatId, senderName = "") {
+    constructor(text, chatId, senderName = "", received = false) {
 
         this.MessageValue = text;
         this.chatId = chatId;
         this.senderName = senderName;
+        this.received = received;
     }
 
 }
@@ -189,11 +203,19 @@ window.onload = function () {
     axios.get(url, {
         withCredentials: true
     }).then(function (response) {
-        response.data[0].forEach(id => joinRoom(id));
+
+        let ids = response.data[0];
+        let usernames = response.data[1];
+        let hasNewMessage = response.data[2];
+        for(let i = 0; i< ids.length; i++){
+            joinRoom(ids[i]);
+            createNewChatTab(usernames[i], ids[i], hasNewMessage[i]);
+        }
+
+        /*response.data[0].forEach(id => joinRoom(id));
         //response.data[1].forEach(name => console.log(name));
         console.log(response.data[0]);
-        response.data[1].forEach(username => createNewChatTab(username));
-        chatIds = response.data;
+        response.data[1].forEach(username => createNewChatTab(username));*/
         console.log(response.data);
         loogedAs.innerHTML= myUsername;
     })
@@ -207,10 +229,14 @@ function onReceiveMessage(messageFromHub, roomId) {
         displayMessage(messageFromHub);
     }
     else {
-        console.log("roomID== c");
+        console.log(`roomID== ${messageFromHub.chatId}`);
+        newMessageNotification(messageFromHub.chatId);
     }
 }
-
+function newMessageNotification(groupId){
+    let chatButton = document.getElementById(`chatId${groupId}`);
+    chatButton.classList.add("notification");
+}
 axios.defaults.withCredentials = true
 logoutButton.addEventListener('click', function () {
     var url = 'https://localhost:7044/chatapp/user/logout';

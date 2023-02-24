@@ -3,9 +3,13 @@ using ChatApp.Entities;
 using ChatApp.Exceptions;
 using ChatApp.Hubs;
 using ChatApp.Models;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Models;
+using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
@@ -13,6 +17,9 @@ namespace ChatApp.Services
 {
     public class ChatService
     {
+        public static int BAD_REQUEST = -1;
+        public static int SUCCESS = 1;
+
         private readonly ChatAppDbContext dbContext;
         private readonly IMapper mapper;
         private readonly IHubContext<ChatHub> hubContext;
@@ -99,14 +106,24 @@ namespace ChatApp.Services
             return messages;
 
         }
-        public void CreateMessage(MessageDTO dto, ClaimsPrincipal user)
+        public int CreateMessage(MessageDTO dto, ClaimsPrincipal user)
         {
+
+            if (dto.ChatId == 0)
+                return BAD_REQUEST;
             Message message = mapper.Map<Message>(dto);
+
+           
+
             message.SendingTime = DateTime.Now;
-            message.UserId = int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            message.SenderName = user.FindFirst(c => c.Type == ClaimTypes.Name).Value;
+            message.SenderId = int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            //   message.SenderName = user.FindFirst(c => c.Type == ClaimTypes.Name).Value;
+            message.Received = false;
+    /*        message.Sender = dbContext.Users.FirstOrDefault(u => u.Id == 1);
+            message.Chat = dbContext.Chats.FirstOrDefault(c => c.Id == message.ChatId);*/
             dbContext.Messages.Add(message);
             dbContext.SaveChanges();
+            return SUCCESS;
         }
 
         public Message GetMessage(int idMess)
@@ -116,11 +133,17 @@ namespace ChatApp.Services
 
         }
 
-        public IEnumerable<Message> GetAllMessages(int chatId)
+        public IEnumerable<SentMessageDTO> GetAllMessages(int chatId)
         {
-            var messages = dbContext.Messages.ToList().Where(x => x.ChatId == chatId);
+            var messages = dbContext.Messages.Include(m => m.Sender).Where(x => x.ChatId == chatId).ToList();
             //  var messages = dbContext.Chats.FirstOrDefault(x => x.Id == chatId).Messages.ToList();
-            return messages;
+            var messagesDTO = mapper.Map<IEnumerable<SentMessageDTO>>(messages).ToList();
+           for(int i = 0; i< messagesDTO.Count(); i++)
+            {
+                messagesDTO[i].SenderName = messages[i].Sender.Name;
+
+            }
+            return messagesDTO;
         }
 
         public string GetUserIdFromUsername(string username)
@@ -144,10 +167,11 @@ namespace ChatApp.Services
         public Object[] GetAllUserChatIds(ClaimsPrincipal user)
         {
             int userId = int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            User user1 = dbContext.Users.Include(x => x.Chats).FirstOrDefault(u => u.Id == userId);
+            User user1 = dbContext.Users.Include(x => x.Chats).ThenInclude(x => x.Messages).FirstOrDefault(u => u.Id == userId);
             List<Chat> chats = user1.Chats.ToList();
             List<int> ids = new();
             List<string> usernames = new();
+            List<bool> hasNewMessage = new();
             chats = dbContext.Chats.Include(x => x.ChatUsers).Where(c => c.ChatUsers.Contains(user1)).ToList();
             foreach (Chat chat in chats)
             {
@@ -158,10 +182,18 @@ namespace ChatApp.Services
                 {
                     usernames.Add(secondChatUser.Login);
                 }
+
+                Message lastReceivedMessage = chat.Messages.LastOrDefault(m => m.SenderId != userId);
+                if (lastReceivedMessage is null)
+                    hasNewMessage.Add(false);
+                else hasNewMessage.Add(chat.Messages.LastOrDefault(m => m.SenderId != userId).Received ? false : true);
+                
             }
-            Object[] result = new Object[2];
+          
+            Object[] result = new Object[3];
             result[0] = ids;
             result[1] = usernames;
+            result[2] = hasNewMessage;
             return result;
         }
         public IEnumerable<Chat> GetAllUserChats(ClaimsPrincipal user)
@@ -178,6 +210,36 @@ namespace ChatApp.Services
             return chats;
         }
 
+        public bool isUserOnline(ClaimsPrincipal user, int chatId)
+        {
+         //   Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(c => c.Id == message.ChatId);
+           
+
+            Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(x => x.Id == chatId);
+            int userId = int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+            User recipient = chat.ChatUsers.FirstOrDefault(u => u.Id != userId);
+            if (OnlineUsers.onlineUsersIds.Contains(recipient.Id.ToString()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+
+        public void ReceiveMessage(int chatId, ClaimsPrincipal user)
+        {
+
+            int userId = int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            Chat chat = dbContext.Chats.Include(c => c.Messages).FirstOrDefault(c => c.Id == chatId);
+            var messages = chat.Messages.Where(m => m.SenderId != userId); //Nie chcemy oflagować wiadomości które sami wysłaliśmy
+            foreach (var message in messages)
+            {
+                message.Received = true;
+                dbContext.Entry(message).State = EntityState.Modified;
+            }
+            dbContext.SaveChanges();
+        }
 
     }
 }

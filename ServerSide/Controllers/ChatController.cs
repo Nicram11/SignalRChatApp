@@ -40,7 +40,11 @@ namespace ChatApp.Controllers
         {
             if(ModelState.IsValid)
             {
-                chatService.CreateMessage(message, User);
+                int result = chatService.CreateMessage(message, User);
+
+                if (result == ChatService.BAD_REQUEST)
+                    return BadRequest("Chat does not exist");
+
                 return Created($"chatapp/chat/message", null);
                 
             }
@@ -57,19 +61,19 @@ namespace ChatApp.Controllers
                 return BadRequest("User not found, please check the name");
             }    
             var messages = chatService.GetAllMessages(chatId);
-
+            chatService.ReceiveMessage(chatId, User);
             return Ok(new { chatId,  messages});
-          
+
         }
 
 
-      /*  [HttpGet("chatIds")]
-        public ActionResult GetAllUserChatIds()
-        {
-            List<int> ids = chatService.GetAllUserChatIds(User);
-            return Ok(ids);
+        /*  [HttpGet("chatIds")]
+          public ActionResult GetAllUserChatIds()
+          {
+              List<int> ids = chatService.GetAllUserChatIds(User);
+              return Ok(ids);
 
-        }*/
+          }*/
 
 
         [HttpGet("onLogin")]
@@ -79,5 +83,6 @@ namespace ChatApp.Controllers
             return Ok(result);
 
         }
+      
     }
 }

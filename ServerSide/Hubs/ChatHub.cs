@@ -11,6 +11,8 @@ namespace ChatApp.Hubs
     public class ChatHub : Hub
     {
         private ChatService _chatService;
+
+      //  public List<string> onlineUsersIds = new List<string>();
         public ChatHub( ChatService chatService)
         {
             _chatService = chatService;
@@ -18,6 +20,7 @@ namespace ChatApp.Hubs
         //   public async Task SendMessage(MessageDTO message, string username /* ,string connId */) => await Clients.Users(_chatService.GetUserIdFromUsername(username)).SendAsync("receiveMessage", message);
         public async Task SendMessageToGroup(SentMessageDTO message, int roomId)
         {
+            
 
             if (_chatService.isUserChatMember(Context.User, roomId))  //Sprawdzanie czy użytkownik jest członkiem chatu
                 await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
@@ -44,6 +47,18 @@ namespace ChatApp.Hubs
             return Clients.User(userId.ToString()).SendAsync("receiveGroupId", groupId);
             
         }
+
+       /* public Task OnConnected()
+        {
+            onlineUsersIds.Add(Context.User.Identity.Name);
+            return Task.CompletedTask;
+        }
+
+        public Task OnDisconnected()
+        {
+            onlineUsersIds.Remove(Context.User.Identity.Name);
+           return Task.CompletedTask;
+        }*/
     }
 
 }

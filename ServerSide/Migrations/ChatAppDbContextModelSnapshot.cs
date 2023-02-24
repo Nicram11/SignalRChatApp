@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ChatApp.Migrations
+namespace ServerSide.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
     partial class ChatAppDbContextModelSnapshot : ModelSnapshot
@@ -56,21 +56,20 @@ namespace ChatApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SenderName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("Received")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("SendingTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
                 });
@@ -116,19 +115,21 @@ namespace ChatApp.Migrations
 
             modelBuilder.Entity("ChatApp.Entities.Message", b =>
                 {
-                    b.HasOne("ChatApp.Entities.Chat", null)
+                    b.HasOne("ChatApp.Entities.Chat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Entities.User", "User")
+                    b.HasOne("ChatApp.Entities.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Chat");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("ChatUser", b =>

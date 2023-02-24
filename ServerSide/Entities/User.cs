@@ -8,7 +8,7 @@ namespace ChatApp.Entities
         public string? Name { get; set; }
         public string Login { get; set; }
         public string HPasswd { get; set; }
-        public List<Chat> Chats{ get; set; } = new List<Chat>();
+        public virtual List<Chat> Chats{ get; set; } = new List<Chat>();
 
 
     }
