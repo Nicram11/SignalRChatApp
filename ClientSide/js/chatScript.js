@@ -84,23 +84,7 @@ async function openChat(username) {
         return new chatInfo(false, res.data.chatId);
     }
 
-/*function openChat(username) {
-   // if (currentOpenChatId != null)
-     //   leaveRoom(currentOpenChatId);
 
-    var url = 'https://localhost:7044/chatapp/chat/message/' + username;
-    var res = axios.get(url, {
-        withCredentials: true
-    })
-        .then(function (response) {
-            console.log(response);
-            displayMessages(response.data.messages);
-            currentOpenChatId = response.data.chatId;
-            return response.status;
-           
-          //  joinRoom(currentOpenChatId);
-        })*/
-   
     function displayMessages(messages) {
 
         messageList.innerHTML = ""; //wyczysc chat z poprzednich wiadomosci
@@ -212,10 +196,7 @@ window.onload = function () {
             createNewChatTab(usernames[i], ids[i], hasNewMessage[i]);
         }
 
-        /*response.data[0].forEach(id => joinRoom(id));
-        //response.data[1].forEach(name => console.log(name));
-        console.log(response.data[0]);
-        response.data[1].forEach(username => createNewChatTab(username));*/
+    
         console.log(response.data);
         loogedAs.innerHTML= myUsername;
     })
