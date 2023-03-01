@@ -104,6 +104,8 @@ function displayMessage(message) {
     let messageText = document.createElement('span');
     let messageTime= document.createElement('span');
 
+
+
     let br = document.createElement('br');
     let br2 = document.createElement('br');
     messageLi.classList.add("message");
@@ -115,7 +117,7 @@ function displayMessage(message) {
 
     messageNickname.innerHTML = message.senderName;
     messageText.innerHTML = message.messageValue;
-    messageTime.innerHTML = message.sendingTime;
+    messageTime.innerHTML = formatDate(message.sendingTime);
     messageLi.appendChild(messageNickname);
     messageLi.appendChild(br);
     messageLi.appendChild(messageText);
@@ -124,6 +126,21 @@ function displayMessage(message) {
 
     messageList.appendChild(messageLi);
     messageWindow.scrollTop = messageWindow.scrollHeight;
+
+
+    function formatDate(stringDate) {
+        let date = new Date(stringDate);
+        let day = date.getDate();
+
+        let month = date.getMonth();
+
+        let year = date.getFullYear();
+
+        let hour = date.getHours();
+
+        let minutes = date.getMinutes();
+        return hour+":"+minutes +" "+day + "/" + month + "/" + year;
+    }
 }
 
 class MessageDTO {
