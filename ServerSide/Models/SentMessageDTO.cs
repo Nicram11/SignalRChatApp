@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Models
+﻿namespace ServerSide.Models
 {
     public class SentMessageDTO
     {

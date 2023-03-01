@@ -20,12 +20,12 @@ namespace ChatApp.Controllers
         {
             this.chatService = chatService;
         }
-
+        /*
         [HttpPost("newchat")]
         public ActionResult CreateNewChat([FromBody]string userNameToConnect)
         {
 
-            var chatId = chatService.CreateChat(User.FindFirst(c=>c.Type == ClaimTypes.NameIdentifier).Value, userNameToConnect);
+            var chatId = chatService.CreateChat(User, userNameToConnect);
             if (chatId == -1)
             {
               
@@ -33,8 +33,8 @@ namespace ChatApp.Controllers
             }
             //   return Created($"chatapp/chat/{chatId}", null);
             return Ok(chatId);
-
-        }
+        
+        }*/
         [HttpPost("message")]
         public ActionResult SendMessage([FromBody] MessageDTO message)
         {
@@ -55,7 +55,7 @@ namespace ChatApp.Controllers
         public ActionResult GetAllMessagesFromChat([FromRoute] String username)
         {
 
-            var chatId = chatService.CreateChat(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value, username);
+            var chatId = chatService.GetChatIdOrCreateChat(User, username);
             if(chatId == -1)
             {
                 return BadRequest("User not found, please check the name");
@@ -66,20 +66,10 @@ namespace ChatApp.Controllers
 
         }
 
-
-        /*  [HttpGet("chatIds")]
-          public ActionResult GetAllUserChatIds()
-          {
-              List<int> ids = chatService.GetAllUserChatIds(User);
-              return Ok(ids);
-
-          }*/
-
-
         [HttpGet("onLogin")]
-        public ActionResult GetAllUserChats()
+        public ActionResult OnLogin()
         {
-            var result = chatService.GetAllUserChatIds(User);
+            var result = chatService.OnLoginData(User);
             return Ok(result);
 
         }

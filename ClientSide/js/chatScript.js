@@ -188,9 +188,9 @@ window.onload = function () {
         withCredentials: true
     }).then(function (response) {
 
-        let ids = response.data[0];
-        let usernames = response.data[1];
-        let hasNewMessage = response.data[2];
+        let ids = response.data.ids;
+        let usernames = response.data.usernames;
+        let hasNewMessage = response.data.hasNewMessageList;
         for(let i = 0; i< ids.length; i++){
             joinRoom(ids[i]);
             createNewChatTab(usernames[i], ids[i], hasNewMessage[i]);

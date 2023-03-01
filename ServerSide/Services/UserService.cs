@@ -12,8 +12,6 @@ using System.Text;
 namespace ChatApp.Services
 {
 
-    
-
     public interface IUserService
     {
         public void RegisterUser(RegisterUserDTO dto);
@@ -26,12 +24,12 @@ namespace ChatApp.Services
 
     public class UserService : IUserService
     {
+
         private readonly ChatAppDbContext dbContext;
         private readonly IMapper mapper;
         private readonly IPasswordHasher<User> passwordHasher;
         private readonly AuthenticationSettings authenticationSettings;
 
- 
 
         public UserService(ChatAppDbContext dbContext, IMapper mapper, IPasswordHasher<User> passwordHasher, AuthenticationSettings authenticationSettings)
         {
@@ -40,6 +38,7 @@ namespace ChatApp.Services
             this.passwordHasher = passwordHasher;
             this.authenticationSettings = authenticationSettings;
         }
+
         public void RegisterUser(RegisterUserDTO dto)
         {
             var user = mapper.Map<User>(dto);
@@ -52,7 +51,6 @@ namespace ChatApp.Services
         {
             var users = dbContext.Users.ToList();
             return mapper.Map<List<RegisterUserDTO>>(users);
-
         }
 
         public string LoginUser(LoginDTO dto)
@@ -71,17 +69,14 @@ namespace ChatApp.Services
             return GenerateJwt(user);
         }
 
-    
         public string GenerateJwt(User user)
         {
-           
 
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                new Claim(ClaimTypes.Name, user.Name),
                new Claim("Login", user.Login),
-
             };
             /*if (!string.IsNullOrEmpty(user.Nationality))
             {
@@ -103,7 +98,12 @@ namespace ChatApp.Services
                 signingCredentials: cred);
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);
+        }
 
+
+        public static int GetUserIdFromClaimsPrincipal(ClaimsPrincipal user)
+        {
+            return int.Parse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
         }
     }
 }

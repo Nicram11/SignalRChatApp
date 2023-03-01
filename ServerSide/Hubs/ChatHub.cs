@@ -3,6 +3,7 @@ using ChatApp.Models;
 using ChatApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using ServerSide.Models;
 using System.Security.Claims;
 
 namespace ChatApp.Hubs

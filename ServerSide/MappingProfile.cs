@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ChatApp.Entities;
 using ChatApp.Models;
+using ServerSide.Models;
 
 namespace ChatApp
 {

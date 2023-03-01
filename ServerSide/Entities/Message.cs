@@ -8,9 +8,7 @@
         public int ChatId { get; set; }
         public DateTime SendingTime { get; set; }
         public bool Received { get; set; } = false;
-
         public virtual Chat Chat { get; set; }
-        
         public virtual User Sender { get; set; }
 
     }
