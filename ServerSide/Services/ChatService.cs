@@ -62,8 +62,8 @@ namespace ChatApp.Services
                 dbContext.SaveChanges();
 
                 chat = user1.Chats.FirstOrDefault(c => c.ChatUsers.Contains(user2));
-                hubContext.Clients.User(user1.Id.ToString()).SendAsync("receiveGroupId", chat.Id);
-                hubContext.Clients.User(user2.Id.ToString()).SendAsync("receiveGroupId", chat.Id);
+                hubContext.Clients.User(user1.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user2.Login);
+                hubContext.Clients.User(user2.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user1.Login);
             }
             return chat.Id;
         }

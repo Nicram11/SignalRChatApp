@@ -9,9 +9,9 @@ connection.on('receiveMessage', messageFromHub=> {
     onReceiveMessage(messageFromHub);
 });
 
-connection.on('receiveGroupId', groupId => { joinRoom(groupId); console.log("HEy, YOU JOINED new Group"); })
+connection.on('receiveGroupId', (groupId, username) => { joinRoom(groupId); console.log("HEy, YOU JOINED new Group"); createNewChatTab(username, groupId, true) });
 
-connection.start().catch(error => { console.log(error.message); })
+connection.start().catch(error => { console.log(error.message); });
 
 function sendMessageToHubGroup(message) {
     connection.invoke('SendMessageToGroup', message, currentOpenChatId);

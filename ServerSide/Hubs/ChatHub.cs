@@ -43,12 +43,15 @@ namespace ChatApp.Hubs
             return Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
         }
 
-        public Task SendGroupId(int userId,int groupId)
+        /*
+        //BaD NAME!!!!!
+        public Task SendGroupId(int userId,int groupId, string username)
         {
-            return Clients.User(userId.ToString()).SendAsync("receiveGroupId", groupId);
+            
+            return Clients.User(userId.ToString()).SendAsync("receiveGroupId", groupId, username);
             
         }
-
+        */
        /* public Task OnConnected()
         {
             onlineUsersIds.Add(Context.User.Identity.Name);
