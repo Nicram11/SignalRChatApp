@@ -2,7 +2,7 @@ token CSRF
 blacklista tokenów
 ukrywanie chatów
 dostosowanie wyglądu okna logowania i rejestracji
-otwieranie okna chatu przy dostaniu wiadomosci od użytkownika z którym nie mamy jeszcze czatu otwartego
 bruteforce blokada
 podzielenie js'a na mniejsze części, poprawienie czytelności skryptów
 nowe wiadomości zostają wyświetlane na górze
+Lista aktwnych użytkowników w pamięci cache 

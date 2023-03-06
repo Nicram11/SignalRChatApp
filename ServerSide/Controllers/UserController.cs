@@ -40,8 +40,6 @@ namespace ChatApp.Controllers
             {
                 string token = userService.LoginUser(dto);
 
-
-                OnlineUsers.onlineUsersIds.Add(User.Identity.Name);
                 Response.Cookies.Append("JwtToken", token, jwtCookieOptions);
                 return Ok(token);
             }
@@ -78,13 +76,6 @@ namespace ChatApp.Controllers
             //HttpContext.Response.Cookies.Append("JwtToken", " ",cookieOptions );
             //HttpContext.Response.Cookies.Append("username", "");
             return NoContent();
-        }
-
-        [HttpPost("disconect")]
-        public ActionResult Disconect()
-        {
-            OnlineUsers.onlineUsersIds.Remove(User.Identity.Name);
-            return Ok();
         }
     }
 }

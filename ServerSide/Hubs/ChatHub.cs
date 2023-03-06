@@ -12,6 +12,7 @@ namespace ChatApp.Hubs
     public class ChatHub : Hub
     {
         private ChatService _chatService;
+      
 
       //  public List<string> onlineUsersIds = new List<string>();
         public ChatHub( ChatService chatService)
@@ -43,6 +44,21 @@ namespace ChatApp.Hubs
             return Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
         }
 
+        public override Task OnConnectedAsync()
+        {
+            var username = Context.User.Identity.Name;
+            if (!OnlineUsers.onlineUsersIds.Contains(username))
+            OnlineUsers.onlineUsersIds.Add(username);
+
+            return base.OnConnectedAsync();
+        }
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+
+            OnlineUsers.onlineUsersIds.Remove(Context.User.Identity.Name);
+
+            return base.OnDisconnectedAsync(exception);
+        }
         /*
         //BaD NAME!!!!!
         public Task SendGroupId(int userId,int groupId, string username)
@@ -52,17 +68,7 @@ namespace ChatApp.Hubs
             
         }
         */
-       /* public Task OnConnected()
-        {
-            onlineUsersIds.Add(Context.User.Identity.Name);
-            return Task.CompletedTask;
-        }
-
-        public Task OnDisconnected()
-        {
-            onlineUsersIds.Remove(Context.User.Identity.Name);
-           return Task.CompletedTask;
-        }*/
+     
     }
 
 }
