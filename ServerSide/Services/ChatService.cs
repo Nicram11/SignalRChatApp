@@ -7,8 +7,10 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Entities;
 using ServerSide.Models;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
@@ -35,33 +37,63 @@ namespace ChatApp.Services
         public int GetChatIdOrCreateChat(ClaimsPrincipal sender, string user2Name)
         {
             Chat chat;
-            var user1 = dbContext.Users.FirstOrDefault(x => x.Id == UserService.GetUserIdFromClaimsPrincipal(sender));
-            var user2 = dbContext.Users.FirstOrDefault(x => x.Login == user2Name);
+            var user1 = dbContext.Users.Include(u => u.ChatUsers).FirstOrDefault(x => x.Id == UserService.GetUserIdFromClaimsPrincipal(sender));
+            var user2 = dbContext.Users.Include(u => u.ChatUsers).FirstOrDefault(x => x.Login == user2Name);
 
             if (user2 is null || user1.Equals(user2))
             {
                 return BAD_REQUEST;
             }
 
-            if (dbContext.Chats.Any(c => c.ChatUsers.Contains(user1) && c.ChatUsers.Contains(user2)))
+            if (dbContext.Chats.Any(c => c.Users.Contains(user1) && c.Users.Contains(user2)))
             {
-                chat = dbContext.Chats.FirstOrDefault((c => c.ChatUsers.Contains(user1) && c.ChatUsers.Contains(user2)));
+                chat = dbContext.Chats.FirstOrDefault((c => c.Users.Contains(user1) && c.Users.Contains(user2)));
             }
             else 
             { 
                 chat = new Chat();
+                chat.ChatUsers = new();
                 chat.ChatUser1Id = user1.Id;
                 chat.ChatUser2Id = user2.Id;
-                chat.ChatUsers.Add(user1);
-                chat.ChatUsers.Add(user2);
+
+           /*     chat.Users.Add(user1);
+                chat.Users.Add(user2);*/
+
+
+
+                ChatUser chatUser1 = new ChatUser { User = user1, Chat = chat , DisplayIndex =  user1.ChatUsers.Count};
+                ChatUser chatUser2 = new ChatUser { User = user2, Chat = chat, DisplayIndex = user2.ChatUsers.Count };
+
+                chat.ChatUsers.AddRange(new[]{ chatUser1, chatUser2 });
                 /*dbContext.Entry(user1).State = EntityState.Modified;
                 dbContext.Entry(user2).State = EntityState.Modified;
                 user1.Chats.Add(chat);
                 user2.Chats.Add(chat);*/
                 dbContext.Chats.Add(chat);
+                
                 dbContext.SaveChanges();
 
-                chat = user1.Chats.FirstOrDefault(c => c.ChatUsers.Contains(user2));
+                /*chat = user1.Chats.FirstOrDefault(c => c.Users.Contains(user2));
+                var chatUsersList = user1.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
+
+                int listCount = chatUsersList.Count;*/
+                
+
+
+               /* var lastIndex = chatUsers.MaxBy(cu => cu.DisplayIndex).DisplayIndex;
+                var chatUser = chatUsers.FirstOrDefault(cu => cu.ChatId == chat.Id);
+                var index = chatUsers.IndexOf(chatUser);
+                for(int i = chatUsers.Count -1; i>= index; i--)
+                {
+                    chatUsers[i+1] = chatUsers[i];
+                }
+                chatUsers.Insert(index, chatUser);*/
+
+              /*  if (lastIndex == null)
+                    chatUser.DisplayIndex = 0;*/
+               // chatUser.IsVisible = true;
+             //   chatUser.DisplayIndex = lastIndex+1;
+             //   chatUsers.
                 hubContext.Clients.User(user1.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user2.Login);
                 hubContext.Clients.User(user2.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user1.Login);
             }
@@ -72,17 +104,63 @@ namespace ChatApp.Services
             if (dto.ChatId == 0)
                 return BAD_REQUEST;
             Message message = mapper.Map<Message>(dto);
-
+            var senderId = UserService.GetUserIdFromClaimsPrincipal(user);
             message.SendingTime = DateTime.Now;
-            message.SenderId = UserService.GetUserIdFromClaimsPrincipal(user);
+            message.SenderId = senderId;
             //   message.SenderName = user.FindFirst(c => c.Type == ClaimTypes.Name).Value;
             message.Received = false;
-    /*        message.Sender = dbContext.Users.FirstOrDefault(u => u.Id == 1);
-            message.Chat = dbContext.Chats.FirstOrDefault(c => c.Id == message.ChatId);*/
+            /*        message.Sender = dbContext.Users.FirstOrDefault(u => u.Id == 1);
+                    message.Chat = dbContext.Chats.FirstOrDefault(c => c.Id == message.ChatId);*/
+
+           // var sender = dbContext.Users.Include(u => u.ChatUsers).FirstOrDefault(u => u.Id == senderId);
+            
+           /* if(sender == null)
+            {
+                return BAD_REQUEST;
+            }*/
+
+            var chat = dbContext.Chats.Include(c => c.Users).ThenInclude(u => u.ChatUsers).FirstOrDefault(c => c.Id == dto.ChatId);
+
+            foreach(User u in chat.Users)
+            {
+                var chatUsers = u.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
+                var chatUser = chatUsers.FirstOrDefault(cu => cu.ChatId == dto.ChatId);
+                var chatUserIndex = chatUsers.IndexOf(chatUser);
+                if (chatUserIndex != chatUsers.Count - 1)
+                {
+                    for (int i = chatUsers.Count - 1; i > chatUserIndex; i--)
+                    {
+                        chatUsers[i].DisplayIndex = chatUsers[i - 1].DisplayIndex;
+                        dbContext.Update(chatUsers[i]);
+                    }
+                    chatUser.DisplayIndex = chatUsers.Count - 1;
+                    dbContext.Update(chatUser);
+                }
+            }
+           
             dbContext.Messages.Add(message);
             dbContext.SaveChanges();
+
+            
             return SUCCESS;
         }
+        private void UpdateDisplayIndex(User user, int chatId)
+        {
+            var chatUsers = user.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
+            var chatUser = chatUsers.FirstOrDefault(cu => cu.ChatId == chatId);
+            var chatUserIndex = chatUsers.IndexOf(chatUser);
+            if (chatUserIndex != chatUsers.Count - 1)
+            {
+                for (int i = chatUsers.Count - 1; i > chatUserIndex; i--)
+                {
+                    chatUsers[i].DisplayIndex = chatUsers[i - 1].DisplayIndex;
+                    dbContext.Update(chatUsers[i]);
+                }
+                chatUser.DisplayIndex = chatUsers.Count - 1;
+                dbContext.Update(chatUser);
+            }
+        }
+
 
         public IEnumerable<SentMessageDTO> GetAllMessages(int chatId)
         {
@@ -105,12 +183,12 @@ namespace ChatApp.Services
 
         public bool isUserChatMember(ClaimsPrincipal user, int chatId)
         {
-            Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(x => x.Id == chatId);
+            Chat chat = dbContext.Chats.Include(c => c.Users).FirstOrDefault(x => x.Id == chatId);
             int userId = UserService.GetUserIdFromClaimsPrincipal(user);
 
             if (chat is null)
                 return false;
-            else if (chat.ChatUsers.Any(u => u.Id == userId))
+            else if (chat.Users.Any(u => u.Id == userId))
                 return true;
             //  else if ((chat.ChatUser1Id == userId) || (chat.ChatUser2Id == userId)) return true;
             return false;
@@ -123,17 +201,30 @@ namespace ChatApp.Services
         /// <returns></returns>
         public OnLoginDataDTO OnLoginData(ClaimsPrincipal user)
         {
-            int userId = UserService.GetUserIdFromClaimsPrincipal(user);
-            User user1 = dbContext.Users.Include(x => x.Chats).ThenInclude(x => x.Messages).FirstOrDefault(u => u.Id == userId);
-            List<Chat> chats = user1.Chats.ToList();
+           int userId = UserService.GetUserIdFromClaimsPrincipal(user);
+               User? user1 = dbContext.Users
+                   .Include(x => x.ChatUsers).ThenInclude(cu => cu.Chat.Messages).
+                   Include( u => u.ChatUsers).ThenInclude(cu => cu.Chat.Users)
+                   .FirstOrDefault(u => u.Id == userId);
+        
+
+            // List<Chat> chats = user1.Chats.ToList();
             List<int> ids = new();
             List<string> usernames = new();
             List<bool> hasNewMessage = new();
-            chats = dbContext.Chats.Include(x => x.ChatUsers).Where(c => c.ChatUsers.Contains(user1)).ToList();
+            //  List<Chat> chats = dbContext.Chats.Include(c => c.ChatUsers).Where(c => c..Contains(user1)).ToList();
+            List<ChatUser> chatUsers = user1.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
+            List<Chat> chats = new List<Chat>();
+            foreach (ChatUser chatUser in chatUsers)
+            {
+                chats.Add(chatUser.Chat);
+            }
+            //chats = chats.OrderBy(c => c.ChatUsers)
             foreach (Chat chat in chats)
             {
                 ids.Add(chat.Id);
-                var secondChatUser = chat.ChatUsers.FirstOrDefault(c => c.Login != user1.Login);
+                
+                var secondChatUser = chat.Users.FirstOrDefault(c => c.Id != userId);
                 if (secondChatUser != null)
                 {
                     usernames.Add(secondChatUser.Login);
@@ -155,10 +246,10 @@ namespace ChatApp.Services
          //   Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(c => c.Id == message.ChatId);
            
 
-            Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(x => x.Id == chatId);
+            Chat chat = dbContext.Chats.Include(c => c.Users).FirstOrDefault(x => x.Id == chatId);
             int userId = UserService.GetUserIdFromClaimsPrincipal(user);
 
-            User recipient = chat.ChatUsers.FirstOrDefault(u => u.Id != userId);
+            User recipient = chat.Users.FirstOrDefault(u => u.Id != userId);
             if (OnlineUsers.onlineUsersIds.Contains(recipient.Id.ToString()))
             {
                 return true;

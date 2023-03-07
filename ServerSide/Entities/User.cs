@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using ServerSide.Entities;
+using System.Reflection.Metadata;
 
 namespace ChatApp.Entities
 {
@@ -9,6 +10,7 @@ namespace ChatApp.Entities
         public string Login { get; set; }
         public string HPasswd { get; set; }
         public virtual List<Chat> Chats{ get; set; } = new List<Chat>();
+        public virtual List<ChatUser> ChatUsers { get; set; }
 
 
     }

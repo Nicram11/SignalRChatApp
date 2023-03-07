@@ -98,17 +98,23 @@ namespace ServerSide.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ChatUser", b =>
+            modelBuilder.Entity("ServerSide.Entities.ChatUser", b =>
                 {
-                    b.Property<int>("ChatUsersId")
+                    b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ChatsId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("ChatUsersId", "ChatsId");
+                    b.Property<int>("DisplayIndex")
+                        .HasColumnType("int");
 
-                    b.HasIndex("ChatsId");
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ChatId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ChatUser");
                 });
@@ -132,24 +138,35 @@ namespace ServerSide.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("ChatUser", b =>
+            modelBuilder.Entity("ServerSide.Entities.ChatUser", b =>
                 {
-                    b.HasOne("ChatApp.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("ChatUsersId")
+                    b.HasOne("ChatApp.Entities.Chat", "Chat")
+                        .WithMany("ChatUsers")
+                        .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Entities.Chat", null)
-                        .WithMany()
-                        .HasForeignKey("ChatsId")
+                    b.HasOne("ChatApp.Entities.User", "User")
+                        .WithMany("ChatUsers")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChatApp.Entities.Chat", b =>
                 {
+                    b.Navigation("ChatUsers");
+
                     b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("ChatApp.Entities.User", b =>
+                {
+                    b.Navigation("ChatUsers");
                 });
 #pragma warning restore 612, 618
         }
