@@ -220,20 +220,33 @@ window.onload = function () {
 
    
 }
-function onReceiveMessage(messageFromHub, roomId) { 
+function onReceiveMessage(messageFromHub) {
+
+    moveExistingChatToStart(messageFromHub.chatId);
    
     if (messageFromHub.chatId == currentOpenChatId) {
         
         displayMessage(messageFromHub);
+
+       
     }
     else {
         console.log(`roomID== ${messageFromHub.chatId}`);
         newMessageNotification(messageFromHub.chatId);
     }
+
+  
 }
 function newMessageNotification(groupId){
     let chatButton = document.getElementById(`chatId${groupId}`);
     chatButton.classList.add("notification");
+
+}
+
+function moveExistingChatToStart(groupId) {
+    let chatButton = document.getElementById(`chatId${groupId}`);
+    userList.removeChild(chatButton);
+    userList.insertBefore(chatButton, userList.firstChild);
 }
 axios.defaults.withCredentials = true
 logoutButton.addEventListener('click', function () {
