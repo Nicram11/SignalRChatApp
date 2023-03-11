@@ -1,8 +1,7 @@
 token CSRF
-blacklista tokenów
+blacklista tokenów w redis'ie
 ukrywanie chatów
 dostosowanie wyglądu okna logowania i rejestracji
 bruteforce blokada
 podzielenie js'a na mniejsze części, poprawienie czytelności skryptów
-nowe wiadomości zostają wyświetlane na górze
 Lista aktwnych użytkowników w pamięci cache 
