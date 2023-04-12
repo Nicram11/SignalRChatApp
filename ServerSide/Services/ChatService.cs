@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using ServerSide.Entities;
 using ServerSide.Models;
+using ServerSide.Services.Core;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -18,7 +19,7 @@ using System.Text.RegularExpressions;
 
 namespace ChatApp.Services
 {
-    public class ChatService
+    public class ChatService : IChatService
     {
         public static int BAD_REQUEST = -1;
         public static int SUCCESS = 1;
@@ -56,44 +57,15 @@ namespace ChatApp.Services
                 chat.ChatUser1Id = user1.Id;
                 chat.ChatUser2Id = user2.Id;
 
-           /*     chat.Users.Add(user1);
-                chat.Users.Add(user2);*/
-
-
-
                 ChatUser chatUser1 = new ChatUser { User = user1, Chat = chat , DisplayIndex =  user1.ChatUsers.Count};
                 ChatUser chatUser2 = new ChatUser { User = user2, Chat = chat, DisplayIndex = user2.ChatUsers.Count };
 
                 chat.ChatUsers.AddRange(new[]{ chatUser1, chatUser2 });
-                /*dbContext.Entry(user1).State = EntityState.Modified;
-                dbContext.Entry(user2).State = EntityState.Modified;
-                user1.Chats.Add(chat);
-                user2.Chats.Add(chat);*/
+
                 dbContext.Chats.Add(chat);
                 
                 dbContext.SaveChanges();
 
-                /*chat = user1.Chats.FirstOrDefault(c => c.Users.Contains(user2));
-                var chatUsersList = user1.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
-
-                int listCount = chatUsersList.Count;*/
-                
-
-
-               /* var lastIndex = chatUsers.MaxBy(cu => cu.DisplayIndex).DisplayIndex;
-                var chatUser = chatUsers.FirstOrDefault(cu => cu.ChatId == chat.Id);
-                var index = chatUsers.IndexOf(chatUser);
-                for(int i = chatUsers.Count -1; i>= index; i--)
-                {
-                    chatUsers[i+1] = chatUsers[i];
-                }
-                chatUsers.Insert(index, chatUser);*/
-
-              /*  if (lastIndex == null)
-                    chatUser.DisplayIndex = 0;*/
-               // chatUser.IsVisible = true;
-             //   chatUser.DisplayIndex = lastIndex+1;
-             //   chatUsers.
                 hubContext.Clients.User(user1.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user2.Login);
                 hubContext.Clients.User(user2.Id.ToString()).SendAsync("receiveGroupId", chat.Id, user1.Login);
             }
@@ -176,12 +148,7 @@ namespace ChatApp.Services
             return messagesDTO;
         }
 
-        public string GetUserIdFromUsername(string username)
-        {
-            return (dbContext.Users.FirstOrDefault(x => x.Login == username).Id).ToString();
-        }
-
-        public bool isUserChatMember(ClaimsPrincipal user, int chatId)
+        public bool IsUserChatMember(ClaimsPrincipal user, int chatId)
         {
             Chat chat = dbContext.Chats.Include(c => c.Users).FirstOrDefault(x => x.Id == chatId);
             int userId = UserService.GetUserIdFromClaimsPrincipal(user);

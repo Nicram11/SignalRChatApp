@@ -5,6 +5,7 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ServerSide.Services.Core;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,14 +13,7 @@ using System.Text;
 namespace ChatApp.Services
 {
 
-    public interface IUserService
-    {
-        public void RegisterUser(RegisterUserDTO dto);
-        public IEnumerable<RegisterUserDTO> GetAll();
-        public string LoginUser(LoginDTO dto);
-        public string GenerateJwt(User user);
-    }
-
+   
 
 
     public class UserService : IUserService
