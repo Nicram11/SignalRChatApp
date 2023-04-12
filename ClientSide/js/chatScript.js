@@ -44,8 +44,9 @@ var currentOpenChatId;
 
 function createNewChatTab(username, chatId, isReceived = false){
 
-let userButton = document.createElement('button');
-    userButton.innerHTML = `<i class="fa-solid fa-user"></i><span>${username}</span>` ;
+let userButton = document.createElement('div');
+    //userButton.innerHTML = `<i class="fa-solid fa-user"></i><span>${username}</span>` ;
+    userButton.innerHTML = `<div><i class="fa-solid fa-user"></i><span>${username}</span></div><button class="element_cancel-button"><i class="fa-solid fa-xmark"></i></button>`
 userButton.classList.add("users-list_element");
     userButton.id = `chatId${chatId}`;
     if(isReceived)
