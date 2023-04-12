@@ -68,13 +68,16 @@ header {
     height: 70px;
     width: 90%;
     background-color: var(--brown);
-    border-bottom: solid 1px #E0E0E0;
+    justify-content: space-between;
     display: flex;
     align-items: center;
     cursor: pointer;
     border-radius: 20px;
     direction: ltr;
-
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 #chat-panel {
@@ -98,11 +101,20 @@ header {
 }
 
 i {
-    margin-left: 10px;
+    margin-left: 15px;
     margin-right: 10px;
 }
 
-
+.element_cancel-button{
+ width: 25px;
+ height: 25px;
+ background-color:inherit;
+margin-right: 3%;
+cursor:initial;
+}
+.element_cancel-button i{
+    margin:auto;
+   }
 
 
 #chat-panel__messages-list {
