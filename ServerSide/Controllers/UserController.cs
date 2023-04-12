@@ -3,6 +3,7 @@ using ChatApp.Services;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using ServerSide.Models;
+using ServerSide.Services.Core;
 
 namespace ChatApp.Controllers
 {

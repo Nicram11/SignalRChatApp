@@ -5,6 +5,7 @@ using ChatApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Services.Core;
 using System.Security.Claims;
 
 namespace ChatApp.Controllers
@@ -14,9 +15,9 @@ namespace ChatApp.Controllers
     [Route("/chatapp/chat")]
     public class ChatController : Controller
     {
-        private readonly ChatService chatService;
+        private readonly IChatService chatService;
 
-        public ChatController(ChatService chatService)
+        public ChatController(IChatService chatService)
         {
             this.chatService = chatService;
         }

@@ -13,6 +13,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ChatApp.Hubs;
+using ServerSide.Services.Core;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,10 +60,10 @@ builder.Services.AddSwaggerGen();
 
 
 
-builder.Services.AddDbContext<ChatAppDbContext>();
+builder.Services.AddDbContext<ChatAppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterValidator>();
-builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

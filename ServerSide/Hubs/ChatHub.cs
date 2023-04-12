@@ -4,6 +4,7 @@ using ChatApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using ServerSide.Models;
+using ServerSide.Services.Core;
 using System.Security.Claims;
 
 namespace ChatApp.Hubs
@@ -11,11 +12,11 @@ namespace ChatApp.Hubs
     [Authorize]
     public class ChatHub : Hub
     {
-        private ChatService _chatService;
+        private IChatService _chatService;
       
 
       //  public List<string> onlineUsersIds = new List<string>();
-        public ChatHub( ChatService chatService)
+        public ChatHub(IChatService chatService)
         {
             _chatService = chatService;
         }
@@ -24,13 +25,13 @@ namespace ChatApp.Hubs
         {
             
 
-            if (_chatService.isUserChatMember(Context.User, roomId))  //Sprawdzanie czy użytkownik jest członkiem chatu
+            if (_chatService.IsUserChatMember(Context.User, roomId))  //Sprawdzanie czy użytkownik jest członkiem chatu
                 await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
             else throw new UnauthorizedAccessException("You cannot perform this Action!");
         }
         public Task JoinRoom(int roomId)
         {
-            if (_chatService.isUserChatMember(Context.User,roomId))  //Sprawdzanie czy użytkownik rzeczywiście jest członkiem chatu do którego próbuje się dostać
+            if (_chatService.IsUserChatMember(Context.User,roomId))  //Sprawdzanie czy użytkownik rzeczywiście jest członkiem chatu do którego próbuje się dostać
                 return Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
             else throw new UnauthorizedAccessException("You cannot perform this Action!");
 
