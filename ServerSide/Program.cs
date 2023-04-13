@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ChatApp.Hubs;
 using ServerSide.Services.Core;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Security.Core;
+using ServerSide.Security.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterValidator>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<ISignInManager<User>, SignInManager>();
+builder.Services.AddScoped<IUserManager<User>, UserManager>();
+builder.Services.AddScoped<IJwtTokenGenerator<User>, JwtGenerator>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 

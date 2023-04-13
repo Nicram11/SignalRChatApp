@@ -1,12 +1,6 @@
 token CSRF
 blacklista tokenów w redis'ie
 ukrywanie chatów
-dostosowanie wyglądu okna logowania i rejestracji
 bruteforce blokada
-podzielenie js'a na mniejsze części, poprawienie czytelności skryptów
 Lista aktwnych użytkowników w pamięci cache 
-<<<<<<< HEAD
 
-GetClaims w modelu np.     var identity = context.User.Identity as ClaimsIdentity; ;
-=======
->>>>>>> 23f2cdc2cd471e0142af8b29c70f1d356bae11c6

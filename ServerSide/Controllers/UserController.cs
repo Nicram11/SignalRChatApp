@@ -20,26 +20,17 @@ namespace ChatApp.Controllers
             Secure = true,
             Path = "/"
         };
-
-
         public UserController(IUserService userService)
         {
             this.userService = userService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<RegisterUserDTO>> GetAll()
-        {
-            var users = userService.GetAll();
-            return Ok(users); ;
-        }
-
         [HttpPost("login")]
-        public ActionResult Login([FromBody] LoginDTO dto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
             if (ModelState.IsValid)
             {
-                string token = userService.LoginUser(dto);
+                string token = await userService.LoginUser(dto);
 
                 Response.Cookies.Append("JwtToken", token, jwtCookieOptions);
                 return Ok(token);
