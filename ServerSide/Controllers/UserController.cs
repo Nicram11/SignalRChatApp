@@ -52,10 +52,6 @@ namespace ChatApp.Controllers
         [HttpPost("logout")]
         public ActionResult Logout()
         {
-           /* foreach (var cookie in HttpContext.Request.Cookies)
-            {
-                Response.Cookies.Delete(cookie.Key);
-            }*/
             CookieOptions cookieOptions = new CookieOptions()
             {
                 HttpOnly = true,
@@ -65,8 +61,6 @@ namespace ChatApp.Controllers
             };
             Response.Cookies.Delete("JwtToken", jwtCookieOptions);
             OnlineUsers.onlineUsersIds.Remove(User.Identity.Name);
-            //HttpContext.Response.Cookies.Append("JwtToken", " ",cookieOptions );
-            //HttpContext.Response.Cookies.Append("username", "");
             return NoContent();
         }
     }

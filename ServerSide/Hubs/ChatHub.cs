@@ -15,7 +15,7 @@ namespace ChatApp.Hubs
         private IChatService _chatService;
       
 
-      //  public List<string> onlineUsersIds = new List<string>();
+
         public ChatHub(IChatService chatService)
         {
             _chatService = chatService;
@@ -25,18 +25,18 @@ namespace ChatApp.Hubs
         {
             
 
-            if (_chatService.IsUserChatMember(Context.User, roomId))  //Sprawdzanie czy użytkownik jest członkiem chatu
+            if (_chatService.IsUserChatMember(Context.User, roomId)) 
                 await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
             else throw new UnauthorizedAccessException("You cannot perform this Action!");
         }
         public Task JoinRoom(int roomId)
         {
-            if (_chatService.IsUserChatMember(Context.User,roomId))  //Sprawdzanie czy użytkownik rzeczywiście jest członkiem chatu do którego próbuje się dostać
+            if (_chatService.IsUserChatMember(Context.User,roomId))
                 return Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
             else throw new UnauthorizedAccessException("You cannot perform this Action!");
 
 
-          //  Clients.Group(roomId).SendMessage( username, username + " Online");
+
         }
 
       
@@ -60,15 +60,6 @@ namespace ChatApp.Hubs
 
             return base.OnDisconnectedAsync(exception);
         }
-        /*
-        //BaD NAME!!!!!
-        public Task SendGroupId(int userId,int groupId, string username)
-        {
-            
-            return Clients.User(userId.ToString()).SendAsync("receiveGroupId", groupId, username);
-            
-        }
-        */
      
     }
 

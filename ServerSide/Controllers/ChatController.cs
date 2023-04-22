@@ -21,21 +21,7 @@ namespace ChatApp.Controllers
         {
             this.chatService = chatService;
         }
-        /*
-        [HttpPost("newchat")]
-        public ActionResult CreateNewChat([FromBody]string userNameToConnect)
-        {
 
-            var chatId = chatService.CreateChat(User, userNameToConnect);
-            if (chatId == -1)
-            {
-              
-                return BadRequest("User not found, please check the name");
-            }
-            //   return Created($"chatapp/chat/{chatId}", null);
-            return Ok(chatId);
-        
-        }*/
         [HttpPost("message")]
         public ActionResult SendMessage([FromBody] MessageDTO message)
         {

@@ -79,17 +79,7 @@ namespace ChatApp.Services
             var senderId = UserService.GetUserIdFromClaimsPrincipal(user);
             message.SendingTime = DateTime.Now;
             message.SenderId = senderId;
-            //   message.SenderName = user.FindFirst(c => c.Type == ClaimTypes.Name).Value;
             message.Received = false;
-            /*        message.Sender = dbContext.Users.FirstOrDefault(u => u.Id == 1);
-                    message.Chat = dbContext.Chats.FirstOrDefault(c => c.Id == message.ChatId);*/
-
-           // var sender = dbContext.Users.Include(u => u.ChatUsers).FirstOrDefault(u => u.Id == senderId);
-            
-           /* if(sender == null)
-            {
-                return BAD_REQUEST;
-            }*/
 
             var chat = dbContext.Chats.Include(c => c.Users).ThenInclude(u => u.ChatUsers).FirstOrDefault(c => c.Id == dto.ChatId);
 
@@ -137,7 +127,6 @@ namespace ChatApp.Services
         public IEnumerable<SentMessageDTO> GetAllMessages(int chatId)
         {
             
-            //var messages = dbContext.Messages.Include(m => m.Sender).Where(x => x.ChatId == chatId).ToList();
             var messages = dbContext.Chats.Include(c => c.Messages).ThenInclude(m => m.Sender).FirstOrDefault(x => x.Id == chatId).Messages.ToList();
             var messagesDTO = mapper.Map<IEnumerable<SentMessageDTO>>(messages).ToList();
             for(int i = 0; i< messagesDTO.Count(); i++)
@@ -157,7 +146,7 @@ namespace ChatApp.Services
                 return false;
             else if (chat.Users.Any(u => u.Id == userId))
                 return true;
-            //  else if ((chat.ChatUser1Id == userId) || (chat.ChatUser2Id == userId)) return true;
+
             return false;
         }
 
@@ -175,18 +164,17 @@ namespace ChatApp.Services
                    .FirstOrDefault(u => u.Id == userId);
         
 
-            // List<Chat> chats = user1.Chats.ToList();
             List<int> ids = new();
             List<string> usernames = new();
             List<bool> hasNewMessage = new();
-            //  List<Chat> chats = dbContext.Chats.Include(c => c.ChatUsers).Where(c => c..Contains(user1)).ToList();
+        
             List<ChatUser> chatUsers = user1.ChatUsers.OrderBy(cu => cu.DisplayIndex).ToList();
             List<Chat> chats = new List<Chat>();
             foreach (ChatUser chatUser in chatUsers)
             {
                 chats.Add(chatUser.Chat);
             }
-            //chats = chats.OrderBy(c => c.ChatUsers)
+
             foreach (Chat chat in chats)
             {
                 ids.Add(chat.Id);
@@ -210,9 +198,7 @@ namespace ChatApp.Services
 
         public bool isUserOnline(ClaimsPrincipal user, int chatId)
         {
-         //   Chat chat = dbContext.Chats.Include(c => c.ChatUsers).FirstOrDefault(c => c.Id == message.ChatId);
            
-
             Chat chat = dbContext.Chats.Include(c => c.Users).FirstOrDefault(x => x.Id == chatId);
             int userId = UserService.GetUserIdFromClaimsPrincipal(user);
 

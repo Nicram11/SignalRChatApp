@@ -30,7 +30,7 @@ recipientButton.addEventListener('click',async function () {
     let chatInfo = await openChat(recipientName);
     console.log(chatInfo);
     if (chatInfo.success && !alredyExisting) {
-        createNewChatTab(recipientName,chatInfo.chatId);
+       // createNewChatTab(recipientName,chatInfo.chatId);
         recipientInput.value = '';
     }
     else if (!chatInfo.success) {
